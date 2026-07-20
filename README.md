@@ -1,4 +1,4 @@
-# Masgent
+# MasgentNova
 
 **Materials Simulation Agent** -- An AI-powered, crash-safe orchestration framework for computational materials science. Masgent unifies DFT calculations, machine learning potentials, and custom simulation workflows under a single, extensible architecture with natural language interaction.
 
