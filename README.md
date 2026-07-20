@@ -1,166 +1,460 @@
-﻿# Masgent
+# Masgent
 
-<!-- [![DOI](https://zenodo.org/badge/1091168992.svg)](https://doi.org/10.5281/zenodo.19456831) -->
+**Materials Simulation Agent** -- An AI-powered, crash-safe orchestration framework for computational materials science. Masgent unifies DFT calculations, machine learning potentials, and custom simulation workflows under a single, extensible architecture with natural language interaction.
+
 [![DOI](https://img.shields.io/badge/DOI-10.1039/D6DD00043F-blue)](https://doi.org/10.1039/D6DD00043F)
-[![DOI](https://img.shields.io/badge/DOI-10.48550/arXiv.2512.23010-blue)](https://doi.org/10.48550/arXiv.2512.23010)
-[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.19456831-blue)](https://doi.org/10.5281/zenodo.19456831)
+[![arXiv](https://img.shields.io/badge/DOI-10.48550/arXiv.2512.23010-blue)](https://doi.org/10.48550/arXiv.2512.23010)
+[![Zenodo](https://img.shields.io/badge/DOI-10.5281/zenodo.19456831-blue)](https://doi.org/10.5281/zenodo.19456831)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-> **Fork Notice**: This repository is a fork of the original [Masgent](https://github.com/aguang5241/masgent) by [Guangchen Liu](https://github.com/aguang5241) (gliu4@wpi.edu), licensed under MIT.  
-> This fork extends Masgent with an AI Agent backend including modular Prompt Assembly, a three-phase execution protocol, an async task engine with crash-safe recovery, and multi-LLM support.  
-> See the [original repository](https://github.com/aguang5241/masgent) for the upstream project. The original citation applies to the base simulation framework.
+## Overview
+
+Masgent is a three-tier asynchronous framework for running materials simulations at scale. You can interact with it through a natural-language AI agent or a structured CLI. The core engine provides process-level crash recovery, persistent task storage, configurable retry policies, and DAG-based workflow scheduling.
+
+**At a glance:**
+
+- Talk to your simulation stack in natural language
+- Multi-LLM support -- OpenAI, Anthropic, Google, DeepSeek, xAI, Alibaba
+- Crash-safe task engine with process-level recovery
+- DAG workflow scheduling (relax, static, DOS, band)
+- Cross-platform execution -- Local, Slurm, WSL
+- 60+ tools covering DFT, MLP, ML training, analysis
+- Pre-trained ML models for Al-Mg-Si-Sc and Al-Co-Cr-Fe-Ni
+
 
 ---
 
+## Table of Contents
 
+- [Features](#features)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [AI Agent Mode](#ai-agent-mode)
+- [CLI Mode](#cli-mode)
+- [Project Structure](#project-structure)
+- [Core Components](#core-components)
+- [Configuration](#configuration)
+- [Development](#development)
+- [Testing](#testing)
+- [Citation](#citation)
+- [License](#license)
 
-Masgent: Materials Simulation Agent
+---
+
+## Features
+
+### DFT Simulation
+- Structure generation from Materials Project database (POSCAR, CIF) and chemical formula
+- Structure modification: supercells, defects (vacancy/substitution/interstitial), surface slabs, interfaces, SQS
+- VASP input generation (INCAR, KPOINTS, POTCAR, POSCAR) with all standard input sets
+- HPC submission script generation (Slurm)
+- Standard workflows: Convergence Test, EOS, Elastic Constants, AIMD, NEB
+- Built-in analysis for all workflow results
+
+### Machine Learning Potentials
+- Single-point energy calculations, geometry relaxation, and molecular dynamics
+- Backends: SevenNet, CHGNet, Orb-v3 (ORB), MatterSim (MatSim) via ASE interface
+- Asynchronous wrapper for synchronous MLP codes
+
+### ML Utilities
+- Composition and structure-based feature analysis
+- Dimensionality reduction (PCA, t-SNE)
+- Data augmentation via Variational Autoencoders (VAE) for small datasets
+- Hyperparameter optimization with Optuna
+- Neural network training and retraining (PyTorch)
+- Pre-trained models for Al-Mg-Si-Sc and Al-Co-Cr-Fe-Ni (UTS, yield strength, elongation)
+
+### Reliability
+- Process-level crash recovery with file-based locks (fcntl)
+- In-process recovery locks (threading) for multi-runner safety
+- Structured error taxonomy (transient, permanent, infrastructure)
+- Configurable retry policy with max retry limits
+- Recovery event audit trail
+
+---
+
+## Architecture
+
+Masgent follows a strict layered architecture:
+
+```
+User / Client (AI Agent / CLI)
+        |
+        v
+   Workflow Layer        (WorkflowBuilder DSL, WorkflowScheduler, DAG)
+        |
+        v
+   Execution Layer       (TaskRunner, RecoveryManager, TaskStateManager)
+        |
+        v
+   Calculator Layer      (VaspCalculator, MLPCalculator, Mock, Cached)
+        |
+        v
+   Executor Layer        (Local, Slurm, WSL, Custom)
+        |
+        v
+   HPC / Local Backend
+```
+
+### Core Design Principles
+
+| Principle | Description |
+|-----------|-------------|
+| Three-layer separation | Execution, Recovery, State layers are fully independent |
+| Single state source | All task state changes go through TaskStateManager |
+| Lock lifecycle binding | FileLock lifetime matches TaskRunner lifetime |
+| Crash safe | Kernel auto-releases locks on crash; tasks recoverable |
+| Process safe | FileLock prevents multi-process duplicate recovery |
+| Structured audit | RecoveryEvent uses typed error codes |
+
+### Task State Machine
+
+```
+PENDING  --->  RUNNING  --->  COMPLETED
+  |               |              |
+  |               +--->  FAILED  |
+  |               |              |
+  |               +--->  CANCELLED
+  |               |
+  |               +--->  UNKNOWN  --->  RUNNING / PENDING / COMPLETED / FAILED
+  |
+  +--->  FAILED / CANCELLED / UNKNOWN / COMPLETED
+```
+
+UNKNOWN resolution strategies: AUTO (probe then decide), POLL (force re-poll), EXECUTE (force re-execute).
+
+---
+
+## Quick Start
+
+**Requirements:** Python >= 3.11, < 3.15
 
 ```bash
-鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?鈺?                                                                        鈺?鈺? 鈻堚枅鈻堚晽   鈻堚枅鈻堚晽  鈻堚枅鈻堚枅鈻堚晽  鈻堚枅鈻堚枅鈻堚枅鈻堚晽  鈻堚枅鈻堚枅鈻堚枅鈺? 鈻堚枅鈻堚枅鈻堚枅鈻堚晽 鈻堚枅鈻堚晽   鈻堚枅鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚枅鈺? 鈺?鈺? 鈻堚枅鈻堚枅鈺?鈻堚枅鈻堚枅鈺?鈻堚枅鈺斺晲鈺愨枅鈻堚晽 鈻堚枅鈺斺晲鈺愨晲鈺愨暆 鈻堚枅鈺斺晲鈺愨晲鈺愨暆  鈻堚枅鈺斺晲鈺愨晲鈺愨暆 鈻堚枅鈻堚枅鈺? 鈻堚枅鈺?鈺氣晲鈺愨枅鈻堚晹鈺愨晲鈺? 鈺?鈺? 鈻堚枅鈺斺枅鈻堚枅鈻堚晹鈻堚枅鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚晳 鈻堚枅鈻堚枅鈻堚枅鈻堚晽 鈻堚枅鈺? 鈻堚枅鈻堚晽 鈻堚枅鈻堚枅鈻堚晽   鈻堚枅鈺斺枅鈻堚晽 鈻堚枅鈺?   鈻堚枅鈺?    鈺?鈺? 鈻堚枅鈺戔暁鈻堚枅鈺斺暆鈻堚枅鈺?鈻堚枅鈺斺晲鈺愨枅鈻堚晳 鈺氣晲鈺愨晲鈺愨枅鈻堚晳 鈻堚枅鈺?  鈻堚枅鈺?鈻堚枅鈺斺晲鈺愨暆   鈻堚枅鈺戔暁鈻堚枅鈺椻枅鈻堚晳    鈻堚枅鈺?    鈺?鈺? 鈻堚枅鈺?鈺氣晲鈺?鈻堚枅鈺?鈻堚枅鈺? 鈻堚枅鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚晳 鈺氣枅鈻堚枅鈻堚枅鈻堚晹鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚晽 鈻堚枅鈺?鈺氣枅鈻堚枅鈻堚晳    鈻堚枅鈺?    鈺?鈺? 鈺氣晲鈺?    鈺氣晲鈺?鈺氣晲鈺? 鈺氣晲鈺?鈺氣晲鈺愨晲鈺愨晲鈺愨暆  鈺氣晲鈺愨晲鈺愨晲鈺? 鈺氣晲鈺愨晲鈺愨晲鈺愨暆 鈺氣晲鈺? 鈺氣晲鈺愨晲鈺?   鈺氣晲鈺?    鈺?鈺?                                                                        鈺?鈺?                                  MASGENT: Materials Simulation Agent   鈺?鈺?                                     Copyright (c) 2025 Guangchen Liu   鈺?鈺?                                                                        鈺?鈺? License:       MIT License                                             鈺?鈺? Citation:      Liu, G. et al. (2025). arXiv: 2512.23010                鈺?鈺? DOI:           https://doi.org/10.48550/arXiv.2512.23010               鈺?鈺? Repository:    https://github.com/aguang5241/Masgent                   鈺?鈺? Contact:       gliu4@wpi.edu                                           鈺?鈺?                                                                        鈺?鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?```
+pip install masgent
+masgent
+```
 
-## 馃殌 Overview
-Masgent is a materials simulation AI agent that streamlines **DFT workflows and analysis**, **fast machine-learning-potential (MLP) simulations**, and **lightweight ML modeling** for materials science. With automated tools for structure handling, VASP input generation, workflow preparation & analysis, and rapid property prediction, Masgent simplifies complex simulation tasks and boosts productivity for both researchers and students.
+Then type your request in natural language:
 
-## 馃帴 Demos
-- **Basic Usage:**  
-  e.g., prepare POSCAR files and generate SQS structures
-  <div align=left><img src='./res/basic_sm.gif' alt='Basic Usage' width='800'/></div>
+```
+Generate a POSCAR file for NaCl.
+Prepare VASP input files for a graphene structure.
+Run an EOS calculation for this structure.
+Predict mechanical properties of Al-Mg-Si-Sc with 0.8 wt.% Mg, 0.6 wt.% Si.
+```
 
-- **AI Agent:**  
-  e.g., prepare POSCAR files and run EOS calculations simply by chatting
-  <div align=left><img src='./res/ai_sm.gif' alt='AI Agent' width='800'/></div>
+### Two Modes
 
-## 猸愶笍 Why Masgent?
-Most materials-simulation tools鈥攑ymatgen, ASE, VASPkit, etc.鈥攔equire manual scripting, multi-step workflows, and deep HPC expertise to run full DFT or ML-based simulations.
-Masgent removes that barrier by providing a unified, AI-driven interface for structure generation, workflow preparation, fast simulations, and analysis.
+- **AI Agent Mode** (masgent): Natural language interface with multi-LLM support, prompt assembly, and tool orchestration
+- **CLI Mode** (masgent --cli): Structured command-line interface for DFT, ML, and MLP operations
 
-**Masgent offers:**
-- An AI-native simulation assistant that prepares VASP workflows, analyzes results, and answers technical questions through natural language.
-- Turn-key VASP workflow templates (Convergence Test, EOS, Elastic, AIMD, NEB) with built-in analysis tools.
-- Automatic generation of all VASP inputs 鈥?INCAR, KPOINTS, POTCAR, POSCAR, and HPC job scripts 鈥?with sensible defaults.
-- One-command structure operations, including defect creation, supercells, slabs, interfaces, and SQS generation.
-- Visualization of structures through interactive web-based viewers.
-- Fast machine-learning-potential simulations using SevenNet, CHGNet, Orb-v3, and MatSim for rapid EOS, elasticity, and MD.
-- Lightweight ML utilities for feature preparation, dimensionality reduction, data augmentation, hyperparameter tuning, and model training.
+---
 
-## 馃 Supported AI Models
-| Provider     | Model             | API Key Required | Notes                                                   |
-|:-------------|:------------------|:-----------------|:--------------------------------------------------------|
-| Masgent      | Masgent AI        | 鉂?No            | No API key needed, response may be slower on cold start |
-| OpenAI       | GPT-5 Nano        | 鉁?Yes           | Requires OpenAI API key                                 |
-| Anthropic    | Claude Sonnet 4.5 | 鉁?Yes           | Requires Anthropic API key                              |
-| Google       | Gemini 2.5 Flash  | 鉁?Yes           | Requires Google API key                                 |
-| xAI          | Grok 4.1 Fast     | 鉁?Yes           | Requires Grok (xAI) API key                             |
-| DeepSeek     | DeepSeek Chat     | 鉁?Yes           | Requires DeepSeek API key                               |
-| Alibaba      | Qwen Flash        | 鉁?Yes           | Requires Alibaba Cloud API key                          |
+## AI Agent Mode
 
+The AI agent (src/masgent/ai_mode/) provides a conversational interface to all Masgent capabilities.
 
-## 馃З Features
-1. Density Functional Theory (DFT) Simulations
-  - 1.1 Structure Preparation & Manipulation
-    - 1.1.1 Generate POSCAR from chemical formula
-    - 1.1.2 Convert POSCAR coordinates (Direct <-> Cartesian)
-    - 1.1.3 Convert structure file formats (CIF, POSCAR, XYZ)
-    - 1.1.4 Generate structures with defects (Vacancies, Substitutions, Interstitials)
-    - 1.1.5 Generate supercells
-    - 1.1.6 Generate Special Quasirandom Structures (SQS)
-    - 1.1.7 Generate surface slabs
-    - 1.1.8 Generate interface structures
-    - 1.1.9 Visualize structures
-  
-  - 1.2 VASP Input File Preparation
-    - 1.2.1 Prepare full VASP input files (INCAR, KPOINTS, POTCAR, POSCAR)
-    - 1.2.2 Generate INCAR templates
-      - MPMetalRelaxSet: suggested for metallic structure relaxation
-      - MPRelaxSet: suggested for structure relaxation
-      - MPStaticSet: suggested for static calculations
-      - MPNonSCFBandSet: suggested for non-self-consistent field calculations (Band structure)
-      - MPNonSCFDOSSet: suggested for non-self-consistent field calculations (Density of States)
-      - MPMDSet: suggested for molecular dynamics simulations
-    - 1.2.3 Generate KPOINTS with specified accuracy
-    - 1.2.4 Generate HPC job submission script
-  
-  - 1.3 Standard VASP Workflow Preparation
-    - 1.3.1 Convergence test (ENCUT, KPOINTS)
-    - 1.3.2 Equation of State (EOS)
-    - 1.3.3 Elastic constants calculations
-    - 1.3.4 Ab-initio Molecular Dynamics (AIMD)
-    - 1.3.5 Nudged Elastic Band (NEB) calculations
-  
-  - 1.4 Standard VASP Workflow Output Analysis
-    - 1.4.1 Convergence test analysis
-    - 1.4.2 Equation of State (EOS) analysis
-    - 1.4.3 Elastic constants analysis 
-    - 1.4.4 Ab-initio Molecular Dynamics (AIMD) analysis
-    - 1.4.5 Nudged Elastic Band (NEB) analysis
+### Multi-LLM Support
 
-2. Fast Simulations Using Machine Learning Potentials (MLPs)
-  - Supported MLPs:
-    - 2.1 SevenNet
-    - 2.2 CHGNet
-    - 2.3 Orb-v3
-    - 2.4 MatSim
-  - Implemented Simulations for all MLPs:
-    - Single Point Energy Calculation
-    - Equation of State (EOS) Calculation
-    - Elastic Constants Calculation
-    - Molecular Dynamics Simulation (NVT)
+| Provider | Models | API Key Required |
+|----------|--------|------------------|
+| Masgent (built-in) | Pydantic AI models | No |
+| OpenAI | GPT-5, GPT-4o, etc. | Yes (openai_api_key) |
+| Anthropic | Claude Sonnet, Opus | Yes (anthropic_api_key) |
+| Google | Gemini 2.5 Flash, Pro | Yes (google_api_key) |
+| xAI | Grok | Yes (grok_api_key) |
+| DeepSeek | DeepSeek Chat | Yes (deepseek_api_key) |
+| Alibaba | Qwen Flash | Yes (dashscope_api_key) |
 
-3. Simple Machine Learning for Materials Science
-  - 3.1 Data Preparation & Feature Analysis
-    - 3.1.1 Feature analysis and visualization
-    - 3.1.2 Dimensionality reduction (if too many features)
-    - 3.1.3 Data augmentation (if limited data)
-  - 3.2 Model Design & Hyperparameter Tuning
-  - 3.3 Model Training & Evaluation
-  - 3.4 Model Retraining with New Data
-  - 3.5 Pre-trained Model Applications
-    - 3.5.1 Mechanical Properties Prediction in Sc-modified Al-Mg-Si Alloys
-    - 3.5.2 Phase Stability & Elastic Properties Prediction in Al-Co-Cr-Fe-Ni High-Entropy Alloys
+### Prompt Assembly
 
-## 馃敡 Installation
-1. Requirements:
-   - Python >= 3.11, < 3.14
-2. Install Masgent:
-    ```bash
-    pip install -U masgent
-    ```
-3. Optional:
-   - Materials Project API key for MP structure access: [materialsproject.org](https://next-gen.materialsproject.org/api)
-   - Setup POTCAR path for Pymatgen, see instructions: [pymatgen.org](https://pymatgen.org/installation.html#potcar-setup)
+The agent uses a modular prompt assembly framework (src/masgent/ai_mode/prompts/):
 
-## 鈻讹笍 Usage
-- After installation, simply run:
-    ```bash
-    masgent
-    ```
-- You'll guided by an interactive menu and can invoke the AI agent anytime. Ask anything in AI chat, for example:
-    ```bash
-    > Generate a POSCAR file for NaCl.
-    > Prepare VASP input files for a graphene structure.
-    > Add defects to a silicon crystal POSCAR.
-    > ...
-    ```
+- **Domain prompts**: Crystallography, defects, DFT/VASP, elastic properties, Materials Project, ML potentials, pymatgen/ASE, surface/interface
+- **Dynamic context**: Model profiles, session state (current files, runs directory, recent tools)
+- **Few-shot examples**: Convergence test, elastic constants, ML prediction
+- **Execution protocols**: Error recovery, parameter validation, Plan -> Execute -> Analyze
+- **Orchestration recipes**: Batch mode, tool chaining, tool selection, workflow recipes
+- **Output formatting**: Comparison tables, next-step suggestions, result formatting standards
 
-## 馃悶 Issues and Suggestions
-Found a bug? Have a feature request?  
-Please open an issue here: [https://github.com/aguang5241/masgent/issues](https://github.com/aguang5241/masgent/issues)
+### Tool Inventory (60+ Tools)
 
-## 馃摎 Cite Us
-If you use Masgent in your research, please cite the following reference:
-  ```
-  @misc{liu2025masgentaiassistedmaterialssimulation,
-    title={Masgent: An AI-assisted Materials Simulation Agent}, 
-    author={Guanghen Liu and Songge Yang and Yu Zhong},
-    year={2025},
-    eprint={2512.23010},
-    archivePrefix={arXiv},
-    primaryClass={physics.comp-ph},
-    url={https://arxiv.org/abs/2512.23010}, 
-  }
-  ```
+Structure generation, VASP input/output, workflow orchestration, ML potentials, ML model training/retraining/prediction, analysis, and visualization.
 
-## 馃檹 Acknowledgements
-Masgent builds on the open-source materials ecosystem, including **ASE**, **Pymatgen**, **Icet**, and modern **Machine Learning Potentials**. We thank the developers of these tools for making advanced materials simulation possible.
+---
+
+## CLI Mode
+
+```bash
+masgent --cli
+```
+
+| Command | Subcommands |
+|---------|-------------|
+| masgent dft | poscar, inputs, relax, eos, elastic, aimd, neb, convergence |
+| masgent ml | features, reduce, augment, design, train, predict |
+| masgent mlp | single-point, relax, eos, elastic, md |
+
+---
+
+## Project Structure
+
+```
+src/masgent/
+  app.py                    Application lifecycle (start, shutdown, signals)
+  cli.py                    CLI entry point
+  _config.py                Global settings (API keys, paths, HPC)
+
+  ai_mode/                  AI Agent backend
+    ai_backend.py              Agent orchestration, tool execution loop
+    memory_manager.py          Layered conversation memory
+    provider_factory.py        Multi-LLM provider factory
+    system_prompt.txt          Base agent system prompt
+    prompts/                   Prompt Assembly framework
+      assembler.py               Dynamic prompt composition
+      registry.py                 PromptModule metadata and routing
+      domain/                     Domain knowledge (crystallography, DFT, defects, elastic, etc.)
+      dynamic/                    Dynamic context (model profiles, session state, few-shot examples)
+      execution/                  Execution protocols (error recovery, parameter validation)
+      orchestration/              Orchestration recipes (batch mode, tool chaining, workflow recipes)
+      output/                     Output formatting (comparison, next-steps, formatting)
+
+  calculators/               Scientific computation layer
+    base.py                    Abstract Calculator
+    vasp.py                    VASP calculator
+    mlp.py                     ML potential calculator
+    cached.py                  TaskStore-based caching decorator
+    mock.py                    Mock calculator for testing
+    registry.py                Factory-based dynamic creation
+    helpers.py                 Shared async utilities
+
+  cli_mode/                  CLI implementation
+    cli_entries.py, cli_run.py, dft.py, ml.py, mlp.py
+
+  executors/                 Process/job execution layer
+    base.py                    Abstract Executor
+    local.py                   Local subprocess executor
+    slurm.py                   Slurm HPC executor
+    wsl.py                     Windows WSL executor
+    factory.py                 Dynamic executor creation
+
+  ml/                        ML internals
+    ml_cvae.py                 CVAE data augmentation
+    ml_nn_design.py            Optuna neural architecture search
+    ml_nn_train.py             PyTorch training loop
+
+  models/                    Shared data models
+    enums.py                   TaskStatus, WorkflowType, UnknownStrategy
+    task.py                    TaskRecord (serialization with pymatgen/numpy support)
+    calculator.py              CalculationResult, CalculationFingerprint, ConfidenceLevel
+    executor.py                CommandResult
+    job.py                     JobHandle
+    events.py                  RecoveryEvent for audit trail
+    error_codes.py             ErrorCode, ErrorCategory, ErrorSource
+    cancel.py                  CancelSource, CancelInfo
+    schemas.py                 Pydantic validation schemas for all tool inputs
+
+  tasks/                     Task engine
+    task_runner.py             TaskRunner (submit, execute, poll, collect, cancel, shutdown)
+    task_store.py              TaskStore + JSONTaskStore (persistence, fingerprint index)
+    task_state.py              TaskStateManager (state transitions, persistence)
+    recovery.py                UNKNOWN task classification helpers
+    recovery_manager.py        RecoveryManager (lock mgmt, retry, timeout)
+    recovery_lock.py           In-process threading-based recovery lock
+    file_lock.py               Cross-process fcntl-based file lock
+    retry.py                   RetryPolicy (max retries, retryable statuses)
+
+  tools/                     Tool definitions for AI agent
+    core.py, structure.py, vasp.py, workflow.py, ml.py, mlp.py
+
+  utils/                     Shared utilities
+    banner.py, fingerprint.py, interface_maker.py, io_helpers.py
+    keychain.py, logger.py, session.py, utils.py, visualize.py, workdir_manager.py
+
+  workflows/                 Workflow definitions and scheduling
+    base.py                    Abstract Workflow
+    eos.py                     EOS workflow (Birch-Murnaghan fitting)
+    builder.py                 Fluent chain-style DSL
+    graph.py                   DAG graph (topological sort, cycle detection)
+    node.py                    WorkflowNode with NodeStatus lifecycle
+    scheduler.py               Concurrent DAG scheduler
+    handle.py                  WorkflowHandle (async result handle)
+    checkpoint.py              Checkpoint save/restore
+    status.py                  WorkflowStatus enum
+```
+
+---
+
+## Core Components
+
+### Calculator Layer
+
+| Method | Purpose |
+|--------|---------|
+| prepare(work_dir, structure, workflow_type) | Write input files |
+| launch(work_dir, executor) | Start calculation |
+| detect_status(work_dir, job_handle) | Check job status |
+| collect(work_dir) | Parse output |
+| cancel(work_dir, job_handle) | Kill job |
+
+**Implementations:** VaspCalculator, MLPCalculator, MockEOSCalculator, CachedCalculator
+
+### Executor Layer
+
+| Method | Purpose |
+|--------|---------|
+| spawn(work_dir, command, env) | Start process / submit job |
+| is_running(job_id, pid) | Check if alive |
+| wait(job_id, timeout) | Wait for completion |
+| kill(job_id) | Terminate job |
+| run(work_dir, command, env, timeout) | Synchronous run (WSL) |
+
+**Implementations:** LocalExecutor, SlurmExecutor, WSLExecutor
+
+### Task Engine
+
+| Component | Responsibility |
+|-----------|---------------|
+| TaskRunner | Submit, execute, poll, cancel, graceful shutdown |
+| TaskStateManager | Single authority for task state transitions |
+| RecoveryManager | UNKNOWN task recovery, lock mgmt, retry policy, timeout |
+| RecoveryLock | In-process (threading) mutual exclusion |
+| FileLock | Cross-process (fcntl) mutual exclusion with stale detection |
+| RetryPolicy | Max retries (default 3), retryable statuses |
+| TaskStore | JSON-based persistence with fingerprint indexing |
+
+### Workflow Layer
+
+| Component | Purpose |
+|-----------|---------|
+| Workflow | Abstract base for sequential workflows |
+| EOSWorkflow | Equation of State with Birch-Murnaghan fitting |
+| WorkflowBuilder | Fluent chain-style DSL (.relax().static().dos().build()) |
+| WorkflowGraph | DAG graph with CRUD, cycle detection, topological sort |
+| WorkflowNode | Individual computation node with NodeStatus lifecycle |
+| WorkflowScheduler | Concurrent DAG executor with dependency resolution |
+| WorkflowHandle | Async result handle |
+| WorkflowCheckpointManager | Persistent checkpoint save/restore for long-running DAGs |
+
+---
+
+## Configuration
+
+Set in a .env file at the project root or as environment variables:
+
+```env
+# API Keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_API_KEY=...
+GROK_API_KEY=...
+DEEPSEEK_API_KEY=...
+DASHSCOPE_API_KEY=...
+MP_API_KEY=...                  # Materials Project
+
+# HPC / Remote
+REMOTE_HOST=hpc.cluster.edu
+REMOTE_USER=username
+REMOTE_KEY=/path/to/ssh/key
+
+# VASP / Pymatgen
+POTCAR_DIR=/path/to/potcars
+
+# Session
+RUNS_DIR=~/masgent_runs
+```
+
+The configuration system (pydantic-settings):
+- Loads from .env file at project root automatically
+- Creates ~/masgent_runs as default session directory
+- Returns empty string gracefully for missing keys
+- Supports runtime reload via reload_config()
+
+---
+
+## Development
+
+```bash
+git clone https://github.com/syndra/masgent.git
+cd masgent
+pip install -e ".[dev,test]"
+```
+
+### Adding a Calculator
+1. Subclass Calculator in src/masgent/calculators/
+2. Implement prepare(), launch(), detect_status(), collect(), cancel()
+3. Register via CalculatorRegistry.register("my_calc", MyCalculator)
+
+### Adding an Executor
+1. Subclass Executor in src/masgent/executors/
+2. Implement spawn(), is_running(), wait(), kill()
+3. Register via ExecutorFactory.register("my_backend", MyExecutor)
+
+### Dependencies
+
+**Core:** Python 3.11+, ASE, NumPy, Pandas, SciPy, scikit-learn, Matplotlib, Seaborn, Pydantic AI, Pymatgen, pymatgen-analysis-defects, mp-api, dotenv, colorama, bullet, yaspin
+
+**ML:** icet, sevenn, chgnet, orb-models, mattersim, optuna
+
+**Dev:** pytest, pytest-asyncio, pytest-cov, build, twine
+
+---
+
+## Testing
+
+```bash
+pytest                           # All tests
+pytest --cov=masgent             # With coverage
+pytest tests/unit/               # Unit tests
+pytest tests/integration/        # Integration tests
+pytest tests/workflows/          # Workflow tests
+pytest tests/tasks/              # Task engine tests
+pytest tests/task_runner/        # Task runner tests
+pytest tests/calculators/        # Calculator tests
+pytest tests/executors/          # Executor tests
+pytest tests/models/             # Data model tests
+```
+
+### Test Infrastructure
+
+- tests/conftest.py: Shared fixtures (mock executors, calculators, task stores, application instances)
+- tests/mock_calculator.py: MockEOSCalculator with parabolic energy for workflow verification
+- tests/mock_executors.py: Mock executors for recovery, timeout, and Slurm scenarios
+
+---
+
+## Citation
+
+```bibtex
+@misc{liu2025masgentaiassistedmaterialssimulation,
+  title={Masgent: An AI-assisted Materials Simulation Agent},
+  author={Guanghen Liu and Songge Yang and Yu Zhong},
+  year={2025},
+  eprint={2512.23010},
+  archivePrefix={arXiv},
+  primaryClass={physics.comp-ph},
+  url={https://arxiv.org/abs/2512.23010},
+}
+```
+
+Additional DOIs:
+- Digital Discovery: 10.1039/D6DD00043F
+- Zenodo: 10.5281/zenodo.19456831
+
+---
+
+## License
+
+MIT License. Copyright (c) 2025 Guangchen Liu, 2026 syndra.
+
+Masgent builds on the open-source materials ecosystem including ASE, Pymatgen, Icet, and modern Machine Learning Potentials.
+
+---
+
+## Acknowledgements
+
+Masgent is built upon the foundational work by Guangchen Liu (original Masgent, https://github.com/aguang5241/masgent). The AI Agent backend, prompt assembly framework, crash recovery system, and workflow orchestration were developed by syndra (https://github.com/syndra/masgent).
+
+We thank the developers of ASE, Pymatgen, Icet, SevenNet, CHGNet, ORB, MatterSim, Optuna, and the broader computational materials science community.

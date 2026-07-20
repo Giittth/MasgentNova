@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "masgent"
 version = "1.1.19"
 description = "Masgent: Materials Simulation Agent"
-readme = "README_PyPI.md"
+readme = "README.md"
 authors = [
     {name = "Guangchen Liu", email = "gliu4@wpi.edu"},
     {name = "syndra", email = "2421760722@qq.com"},
