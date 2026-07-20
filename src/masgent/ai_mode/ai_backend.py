@@ -165,6 +165,8 @@ async def ai_mode(agent):
                         history = await chat(agent, user_input, history)
                     else:
                         history = await chat_stream(agent, user_input, history)
+                    # Trim history via layered memory manager
+                    history = await create_memory_processor()(history)
                 except Exception as e:
                     color_print(f"[Error]: {e}", "red")
     except (KeyboardInterrupt, EOFError):
@@ -294,11 +296,10 @@ def main():
             tools.train_model_for_machine_learning,
             tools.retrain_model_for_machine_learning,
             tools.model_prediction_for_AlMgSiSc,
-            tools.model_prediction_for_AlCoCrFeNi,
-            tools.read_doc_file,
-    ],
-        history_processors=[create_memory_processor()],
-    )
+    tools.model_prediction_for_AlCoCrFeNi,
+    tools.read_doc_file,
+],
+)
 
     mode = asyncio.run(ai_mode(agent))
     return mode
