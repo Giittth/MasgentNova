@@ -1,0 +1,26 @@
+# ==================== Core ====================
+ase
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+seaborn
+pydantic_ai
+pymatgen
+pymatgen-analysis-defects
+mp-api
+dotenv
+colorama
+bullet
+yaspin
+
+# ==================== Machine Learning ====================
+icet
+optuna
+
+# ==================== ML Potentials (optional) ====================
+# sevenn
+# chgnet
+# orb-models
+# mattersim
