@@ -1,0 +1,36 @@
+{
+  "task_id": "cache_474de366",
+  "workflow_type": "single_point",
+  "status": "completed",
+  "created_at": "2026-06-21T10:44:26.409179",
+  "updated_at": "2026-06-21T10:44:26.409201",
+  "work_dir": "",
+  "metadata": {
+    "cached": true,
+    "calculator_type": "VaspCalculator"
+  },
+  "result": {
+    "data": {
+      "work_dir": "/home/malzahar/masgent_runs/Si/single_point/94eec1c8e11b6880",
+      "files": [
+        "POSCAR",
+        "INCAR",
+        "KPOINTS",
+        "POTCAR.spec"
+      ],
+      "status": "prepared",
+      "energy": -10.0,
+      "energy_per_atom": -1.25
+    },
+    "metadata": {
+      "calculator": "VASP",
+      "executor": "LocalExecutor",
+      "stage": "task_calculator_demo",
+      "task_id": "vasp_c8a0cdb3_20260621_104426",
+      "work_dir": "/home/malzahar/masgent_runs/Si/single_point/94eec1c8e11b6880"
+    }
+  },
+  "error_message": null,
+  "fingerprint": "87857d1f8fed4a18",
+  "finished_at": "2026-06-21T10:44:26.409202"
+}

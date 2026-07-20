@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "masgent"
+version = "1.1.19"
+description = "Masgent: Materials Simulation Agent"
+readme = "README_PyPI.md"
+authors = [
+    {name = "Guangchen Liu", email = "gliu4@wpi.edu"},
+    {name = "syndra", email = "2421760722@qq.com"},
+]
+maintainers = [
+    {name = "syndra", email = "2421760722@qq.com"},
+]
+keywords = ["AI agent", "Materials Simulation", "Density Functional Theory", "Machine Learning Potentials", "Machine Learning"]
+license = {text = "MIT"}
+requires-python = ">=3.11, <3.15"
+dependencies = [
+    "ase",
+    "numpy",
+    "pandas",
+    "scipy",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "pydantic_ai",
+    "pymatgen",
+    "pymatgen-analysis-defects",
+    "mp-api",
+    "dotenv",
+    "colorama",
+    "bullet",
+    "yaspin",
+    "icet",
+    "sevenn",
+    "chgnet",
+    "orb-models",
+    "mattersim",
+    "optuna",
+    "pydantic-settings>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["build", "twine"]
+docs = []
+test = [                             
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/syndra/masgent"
+Issues = "https://github.com/syndra/masgent/issues"
+Repository = "https://github.com/syndra/masgent"
+
+[project.scripts]
+masgent = "masgent.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"masgent" = [
+    "ai_mode/system_prompt.txt",
+    "res/ml_db_AlMgSiSc.pkl",
+    "res/ml_nn_AlMgSiSc.pkl",
+    "res/ml_nn_AlCoCrFeNi.pkl",
+    "res/ml_xs_AlMgSiSc.pkl",
+    "res/ml_xs_AlCoCrFeNi.pkl",
+    "res/ml_ys_AlMgSiSc.pkl",
+    "res/ml_ys_AlCoCrFeNi.pkl",
+]
+
+# ===== ?????ytest ??? =====
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

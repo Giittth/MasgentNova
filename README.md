@@ -1,0 +1,166 @@
+﻿# Masgent
+
+<!-- [![DOI](https://zenodo.org/badge/1091168992.svg)](https://doi.org/10.5281/zenodo.19456831) -->
+[![DOI](https://img.shields.io/badge/DOI-10.1039/D6DD00043F-blue)](https://doi.org/10.1039/D6DD00043F)
+[![DOI](https://img.shields.io/badge/DOI-10.48550/arXiv.2512.23010-blue)](https://doi.org/10.48550/arXiv.2512.23010)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.19456831-blue)](https://doi.org/10.5281/zenodo.19456831)
+
+---
+
+> **Fork Notice**: This repository is a fork of the original [Masgent](https://github.com/aguang5241/masgent) by [Guangchen Liu](https://github.com/aguang5241) (gliu4@wpi.edu), licensed under MIT.  
+> This fork extends Masgent with an AI Agent backend including modular Prompt Assembly, a three-phase execution protocol, an async task engine with crash-safe recovery, and multi-LLM support.  
+> See the [original repository](https://github.com/aguang5241/masgent) for the upstream project. The original citation applies to the base simulation framework.
+
+---
+
+
+
+Masgent: Materials Simulation Agent
+
+```bash
+鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?鈺?                                                                        鈺?鈺? 鈻堚枅鈻堚晽   鈻堚枅鈻堚晽  鈻堚枅鈻堚枅鈻堚晽  鈻堚枅鈻堚枅鈻堚枅鈻堚晽  鈻堚枅鈻堚枅鈻堚枅鈺? 鈻堚枅鈻堚枅鈻堚枅鈻堚晽 鈻堚枅鈻堚晽   鈻堚枅鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚枅鈺? 鈺?鈺? 鈻堚枅鈻堚枅鈺?鈻堚枅鈻堚枅鈺?鈻堚枅鈺斺晲鈺愨枅鈻堚晽 鈻堚枅鈺斺晲鈺愨晲鈺愨暆 鈻堚枅鈺斺晲鈺愨晲鈺愨暆  鈻堚枅鈺斺晲鈺愨晲鈺愨暆 鈻堚枅鈻堚枅鈺? 鈻堚枅鈺?鈺氣晲鈺愨枅鈻堚晹鈺愨晲鈺? 鈺?鈺? 鈻堚枅鈺斺枅鈻堚枅鈻堚晹鈻堚枅鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚晳 鈻堚枅鈻堚枅鈻堚枅鈻堚晽 鈻堚枅鈺? 鈻堚枅鈻堚晽 鈻堚枅鈻堚枅鈻堚晽   鈻堚枅鈺斺枅鈻堚晽 鈻堚枅鈺?   鈻堚枅鈺?    鈺?鈺? 鈻堚枅鈺戔暁鈻堚枅鈺斺暆鈻堚枅鈺?鈻堚枅鈺斺晲鈺愨枅鈻堚晳 鈺氣晲鈺愨晲鈺愨枅鈻堚晳 鈻堚枅鈺?  鈻堚枅鈺?鈻堚枅鈺斺晲鈺愨暆   鈻堚枅鈺戔暁鈻堚枅鈺椻枅鈻堚晳    鈻堚枅鈺?    鈺?鈺? 鈻堚枅鈺?鈺氣晲鈺?鈻堚枅鈺?鈻堚枅鈺? 鈻堚枅鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚晳 鈺氣枅鈻堚枅鈻堚枅鈻堚晹鈺?鈻堚枅鈻堚枅鈻堚枅鈻堚晽 鈻堚枅鈺?鈺氣枅鈻堚枅鈻堚晳    鈻堚枅鈺?    鈺?鈺? 鈺氣晲鈺?    鈺氣晲鈺?鈺氣晲鈺? 鈺氣晲鈺?鈺氣晲鈺愨晲鈺愨晲鈺愨暆  鈺氣晲鈺愨晲鈺愨晲鈺? 鈺氣晲鈺愨晲鈺愨晲鈺愨暆 鈺氣晲鈺? 鈺氣晲鈺愨晲鈺?   鈺氣晲鈺?    鈺?鈺?                                                                        鈺?鈺?                                  MASGENT: Materials Simulation Agent   鈺?鈺?                                     Copyright (c) 2025 Guangchen Liu   鈺?鈺?                                                                        鈺?鈺? License:       MIT License                                             鈺?鈺? Citation:      Liu, G. et al. (2025). arXiv: 2512.23010                鈺?鈺? DOI:           https://doi.org/10.48550/arXiv.2512.23010               鈺?鈺? Repository:    https://github.com/aguang5241/Masgent                   鈺?鈺? Contact:       gliu4@wpi.edu                                           鈺?鈺?                                                                        鈺?鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?```
+
+## 馃殌 Overview
+Masgent is a materials simulation AI agent that streamlines **DFT workflows and analysis**, **fast machine-learning-potential (MLP) simulations**, and **lightweight ML modeling** for materials science. With automated tools for structure handling, VASP input generation, workflow preparation & analysis, and rapid property prediction, Masgent simplifies complex simulation tasks and boosts productivity for both researchers and students.
+
+## 馃帴 Demos
+- **Basic Usage:**  
+  e.g., prepare POSCAR files and generate SQS structures
+  <div align=left><img src='./res/basic_sm.gif' alt='Basic Usage' width='800'/></div>
+
+- **AI Agent:**  
+  e.g., prepare POSCAR files and run EOS calculations simply by chatting
+  <div align=left><img src='./res/ai_sm.gif' alt='AI Agent' width='800'/></div>
+
+## 猸愶笍 Why Masgent?
+Most materials-simulation tools鈥攑ymatgen, ASE, VASPkit, etc.鈥攔equire manual scripting, multi-step workflows, and deep HPC expertise to run full DFT or ML-based simulations.
+Masgent removes that barrier by providing a unified, AI-driven interface for structure generation, workflow preparation, fast simulations, and analysis.
+
+**Masgent offers:**
+- An AI-native simulation assistant that prepares VASP workflows, analyzes results, and answers technical questions through natural language.
+- Turn-key VASP workflow templates (Convergence Test, EOS, Elastic, AIMD, NEB) with built-in analysis tools.
+- Automatic generation of all VASP inputs 鈥?INCAR, KPOINTS, POTCAR, POSCAR, and HPC job scripts 鈥?with sensible defaults.
+- One-command structure operations, including defect creation, supercells, slabs, interfaces, and SQS generation.
+- Visualization of structures through interactive web-based viewers.
+- Fast machine-learning-potential simulations using SevenNet, CHGNet, Orb-v3, and MatSim for rapid EOS, elasticity, and MD.
+- Lightweight ML utilities for feature preparation, dimensionality reduction, data augmentation, hyperparameter tuning, and model training.
+
+## 馃 Supported AI Models
+| Provider     | Model             | API Key Required | Notes                                                   |
+|:-------------|:------------------|:-----------------|:--------------------------------------------------------|
+| Masgent      | Masgent AI        | 鉂?No            | No API key needed, response may be slower on cold start |
+| OpenAI       | GPT-5 Nano        | 鉁?Yes           | Requires OpenAI API key                                 |
+| Anthropic    | Claude Sonnet 4.5 | 鉁?Yes           | Requires Anthropic API key                              |
+| Google       | Gemini 2.5 Flash  | 鉁?Yes           | Requires Google API key                                 |
+| xAI          | Grok 4.1 Fast     | 鉁?Yes           | Requires Grok (xAI) API key                             |
+| DeepSeek     | DeepSeek Chat     | 鉁?Yes           | Requires DeepSeek API key                               |
+| Alibaba      | Qwen Flash        | 鉁?Yes           | Requires Alibaba Cloud API key                          |
+
+
+## 馃З Features
+1. Density Functional Theory (DFT) Simulations
+  - 1.1 Structure Preparation & Manipulation
+    - 1.1.1 Generate POSCAR from chemical formula
+    - 1.1.2 Convert POSCAR coordinates (Direct <-> Cartesian)
+    - 1.1.3 Convert structure file formats (CIF, POSCAR, XYZ)
+    - 1.1.4 Generate structures with defects (Vacancies, Substitutions, Interstitials)
+    - 1.1.5 Generate supercells
+    - 1.1.6 Generate Special Quasirandom Structures (SQS)
+    - 1.1.7 Generate surface slabs
+    - 1.1.8 Generate interface structures
+    - 1.1.9 Visualize structures
+  
+  - 1.2 VASP Input File Preparation
+    - 1.2.1 Prepare full VASP input files (INCAR, KPOINTS, POTCAR, POSCAR)
+    - 1.2.2 Generate INCAR templates
+      - MPMetalRelaxSet: suggested for metallic structure relaxation
+      - MPRelaxSet: suggested for structure relaxation
+      - MPStaticSet: suggested for static calculations
+      - MPNonSCFBandSet: suggested for non-self-consistent field calculations (Band structure)
+      - MPNonSCFDOSSet: suggested for non-self-consistent field calculations (Density of States)
+      - MPMDSet: suggested for molecular dynamics simulations
+    - 1.2.3 Generate KPOINTS with specified accuracy
+    - 1.2.4 Generate HPC job submission script
+  
+  - 1.3 Standard VASP Workflow Preparation
+    - 1.3.1 Convergence test (ENCUT, KPOINTS)
+    - 1.3.2 Equation of State (EOS)
+    - 1.3.3 Elastic constants calculations
+    - 1.3.4 Ab-initio Molecular Dynamics (AIMD)
+    - 1.3.5 Nudged Elastic Band (NEB) calculations
+  
+  - 1.4 Standard VASP Workflow Output Analysis
+    - 1.4.1 Convergence test analysis
+    - 1.4.2 Equation of State (EOS) analysis
+    - 1.4.3 Elastic constants analysis 
+    - 1.4.4 Ab-initio Molecular Dynamics (AIMD) analysis
+    - 1.4.5 Nudged Elastic Band (NEB) analysis
+
+2. Fast Simulations Using Machine Learning Potentials (MLPs)
+  - Supported MLPs:
+    - 2.1 SevenNet
+    - 2.2 CHGNet
+    - 2.3 Orb-v3
+    - 2.4 MatSim
+  - Implemented Simulations for all MLPs:
+    - Single Point Energy Calculation
+    - Equation of State (EOS) Calculation
+    - Elastic Constants Calculation
+    - Molecular Dynamics Simulation (NVT)
+
+3. Simple Machine Learning for Materials Science
+  - 3.1 Data Preparation & Feature Analysis
+    - 3.1.1 Feature analysis and visualization
+    - 3.1.2 Dimensionality reduction (if too many features)
+    - 3.1.3 Data augmentation (if limited data)
+  - 3.2 Model Design & Hyperparameter Tuning
+  - 3.3 Model Training & Evaluation
+  - 3.4 Model Retraining with New Data
+  - 3.5 Pre-trained Model Applications
+    - 3.5.1 Mechanical Properties Prediction in Sc-modified Al-Mg-Si Alloys
+    - 3.5.2 Phase Stability & Elastic Properties Prediction in Al-Co-Cr-Fe-Ni High-Entropy Alloys
+
+## 馃敡 Installation
+1. Requirements:
+   - Python >= 3.11, < 3.14
+2. Install Masgent:
+    ```bash
+    pip install -U masgent
+    ```
+3. Optional:
+   - Materials Project API key for MP structure access: [materialsproject.org](https://next-gen.materialsproject.org/api)
+   - Setup POTCAR path for Pymatgen, see instructions: [pymatgen.org](https://pymatgen.org/installation.html#potcar-setup)
+
+## 鈻讹笍 Usage
+- After installation, simply run:
+    ```bash
+    masgent
+    ```
+- You'll guided by an interactive menu and can invoke the AI agent anytime. Ask anything in AI chat, for example:
+    ```bash
+    > Generate a POSCAR file for NaCl.
+    > Prepare VASP input files for a graphene structure.
+    > Add defects to a silicon crystal POSCAR.
+    > ...
+    ```
+
+## 馃悶 Issues and Suggestions
+Found a bug? Have a feature request?  
+Please open an issue here: [https://github.com/aguang5241/masgent/issues](https://github.com/aguang5241/masgent/issues)
+
+## 馃摎 Cite Us
+If you use Masgent in your research, please cite the following reference:
+  ```
+  @misc{liu2025masgentaiassistedmaterialssimulation,
+    title={Masgent: An AI-assisted Materials Simulation Agent}, 
+    author={Guanghen Liu and Songge Yang and Yu Zhong},
+    year={2025},
+    eprint={2512.23010},
+    archivePrefix={arXiv},
+    primaryClass={physics.comp-ph},
+    url={https://arxiv.org/abs/2512.23010}, 
+  }
+  ```
+
+## 馃檹 Acknowledgements
+Masgent builds on the open-source materials ecosystem, including **ASE**, **Pymatgen**, **Icet**, and modern **Machine Learning Potentials**. We thank the developers of these tools for making advanced materials simulation possible.
