@@ -4,6 +4,10 @@
 
 [![arXiv](https://img.shields.io/badge/DOI-10.48550/arXiv.2512.23010-blue)](https://arxiv.org/abs/2512.23010)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+ 
+> **Fork Notice**: This repository is a fork of the original [Masgent](https://github.com/aguang5241/masgent) by [Guangchen Liu](https://github.com/aguang5241) (gliu4@wpi.edu), licensed under MIT.
+> This fork extends Masgent with an AI Agent backend including modular Prompt Assembly, a three-phase execution protocol, an async task engine with crash-safe recovery, and multi-LLM support.
+> See the [original repository](https://github.com/aguang5241/masgent) for the upstream project. The original citation applies to the base simulation framework.
 
 ---
 
@@ -519,8 +523,9 @@ Additional DOI: [10.48550/arXiv.2512.23010](https://arxiv.org/abs/2512.23010)
 
 MIT License. See [LICENSE](LICENSE) for details.
 
-### Acknowledgements
-
-- Original DFT/ML structure inspired by [ASE](https://wiki.fysik.dtu.dk/ase/) and [pymatgen](https://pymatgen.org/) communities.
-- MLP backends: CHGNet (Ceder Group), SevenNet (MDIL-SNU), Orb (Orbital Materials), MatterSim (Microsoft Research).
-- Pre-trained models trained on Materials Project and literature data.
+ ### Acknowledgements
+ 
+ - **Original Masgent** by [Guangchen Liu](https://github.com/aguang5241) & Yu Zhong — the DFT/ML simulation foundation this project extends. Original DOI: [10.48550/arXiv.2512.23010](https://arxiv.org/abs/2512.23010).
+ - [ASE](https://wiki.fysik.dtu.dk/ase/) and [pymatgen](https://pymatgen.org/) communities for the open materials science ecosystem.
+ - MLP backends: CHGNet (Ceder Group), SevenNet (MDIL-SNU), Orb (Orbital Materials), MatterSim (Microsoft Research).
+ - Pre-trained models trained on Materials Project and literature data.
