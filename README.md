@@ -3,10 +3,11 @@
 **Materials Simulation Agent** -- An AI-powered, crash-safe framework that unifies DFT calculations, machine learning potentials, and ML model training under a single architecture. Interact through natural language (AI Agent) or structured menus (CLI).
 
 [![arXiv](https://img.shields.io/badge/DOI-10.48550/arXiv.2512.23010-blue)](https://arxiv.org/abs/2512.23010)
+[![GitHub](https://img.shields.io/badge/GitHub-Giittth/MasgentNova-181717?logo=github)](https://github.com/Giittth/MasgentNova)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
- 
+
 > **Fork Notice**: This repository is a fork of the original [Masgent](https://github.com/aguang5241/masgent) by [Guangchen Liu](https://github.com/aguang5241) (gliu4@wpi.edu), licensed under MIT.
-> This fork extends Masgent with an AI Agent backend including modular Prompt Assembly, a three-phase execution protocol, an async task engine with crash-safe recovery, and multi-LLM support.
+> **My fork**: [https://github.com/Giittth/MasgentNova](https://github.com/Giittth/MasgentNova) — extends the original with an AI Agent backend including modular Prompt Assembly, a three-phase execution protocol, an async task engine with crash-safe recovery, and multi-LLM support.
 > See the [original repository](https://github.com/aguang5241/masgent) for the upstream project. The original citation applies to the base simulation framework.
 
 ---
@@ -129,18 +130,11 @@ Masgent is a five-layer asynchronous framework designed for crash-safe materials
 - Python >= 3.11, < 3.15
 - At least one LLM API key (OpenAI, Anthropic, Google, etc.)
 
-### PyPI install
-
-```
-pip install masgent
-masgent
-```
-
 ### Manual install
 
 ```
-git clone https://github.com/syndra/masgent.git
-cd masgent
+git clone https://github.com/Giittth/MasgentNova.git
+cd MasgentNova
 python3 -m venv .venv
 source .venv/bin/activate    (Windows: .venv\Scripts\activate)
 pip install -e .
@@ -151,7 +145,7 @@ masgent
 ### One-liner (Linux/WSL)
 
 ```
-bash <(curl -s https://raw.githubusercontent.com/syndra/masgent/main/scripts/setup.sh)
+bash <(curl -s https://raw.githubusercontent.com/Giittth/MasgentNova/main/scripts/setup.sh)
 ```
 
 ### Quick example
@@ -511,7 +505,7 @@ If you use Masgent in your research:
   title = {Masgent: Materials Simulation Agent},
   year = {2024},
   doi = {10.48550/arXiv.2512.23010},
-  url = {https://github.com/syndra/masgent}
+  url = {https://github.com/Giittth/MasgentNova}
 }
 ```
 
@@ -524,7 +518,7 @@ Additional DOI: [10.48550/arXiv.2512.23010](https://arxiv.org/abs/2512.23010)
 MIT License. See [LICENSE](LICENSE) for details.
 
  ### Acknowledgements
- 
+
  - **Original Masgent** by [Guangchen Liu](https://github.com/aguang5241) & Yu Zhong — the DFT/ML simulation foundation this project extends. Original DOI: [10.48550/arXiv.2512.23010](https://arxiv.org/abs/2512.23010).
  - [ASE](https://wiki.fysik.dtu.dk/ase/) and [pymatgen](https://pymatgen.org/) communities for the open materials science ecosystem.
  - MLP backends: CHGNet (Ceder Group), SevenNet (MDIL-SNU), Orb (Orbital Materials), MatterSim (Microsoft Research).
